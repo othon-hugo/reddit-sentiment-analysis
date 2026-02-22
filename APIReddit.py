@@ -1,9 +1,13 @@
-import praw
-import pandas as pd
+import praw # type: ignore
+import pandas as pd # type: ignore
 import re
 import emoji
-from langdetect import detect, LangDetectException
+from langdetect import detect, LangDetectException # type: ignore
 import random
+from dotenv import load_dotenv
+from os import getenv
+
+load_dotenv()
 
 # Regex para remover caracteres inválidos no Excel
 ILLEGAL_CHARACTERS_RE = re.compile(r"[\000-\010]|[\013-\014]|[\016-\037]")
@@ -13,9 +17,9 @@ subreddits_alvo = ["conversas"]
 
 # Configurações da API do Reddit
 reddit = praw.Reddit(
-    client_id="<CLIENT_ID>",
-    client_secret="<CLIENT_API>",
-    user_agent="ICAnaliseSentimentosBot/0.1 by AnaliseSentimentosIC",
+    client_id=getenv("REDDIT_CLIENT_ID"),
+    client_secret=getenv("REDDIT_CLIENT_SECRET"),
+    user_agent=getenv("REDDIT_CLIENT_USER_AGENT"),
 )
 
 contador = 1
