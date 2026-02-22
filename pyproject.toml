@@ -1,0 +1,92 @@
+[tool.poetry]
+name = ""
+description = ""
+version = "1.0.0"
+readme = "README.md"
+authors = []
+keywords = [
+    "sentiment-analysis",
+    "natural-language-processing",
+    "machine-learning",
+    "deep-learning",
+    "text-mining",
+    "text-classification",
+    "social-media-analysis",
+    "transformer-models",
+    "word-embeddings",
+    "bag-of-words",
+    "data-preprocessing",
+    "model-evaluation",
+    "computational-linguistics"
+]
+classifiers = []
+packages = []
+
+[tool.poetry.urls]
+Homepage = "
+Repository = ""
+Issues = ""
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pylint = "^3.3.8"
+mypy = "^1.18.2"
+black = "^25.9.0"
+isort = "^6.1.0"
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.main]
+source-roots = []
+max-line-length = 79
+recursive = true
+disable = [
+    "broad-exception-caught",
+    "missing-module-docstring",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-locals",
+    "unused-argument",
+    "duplicate-code"
+]
+ignore-paths = [".venv/", "build/", "tests/"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = ""
+exclude = []
+pretty = true
+strict = true
+disallow_any_expr = false
+disallow_any_unimported = false
+disallow_subclassing_any = false
+
+[tool.black]
+line-length = 79
+target-version = ["py311"]
+exclude = '''
+/(
+    \.git
+| \.venv
+| build
+| dist
+| migrations
+| .venv
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.pytest.ini_options]
+addopts = "-raqsv --strict-markers --tb=no"
+pythonpath = ["src"]
+testpaths = ["tests"]
+norecursedirs = [".vscode", "__pycache__"]
+markers = []
