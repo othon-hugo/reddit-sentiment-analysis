@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING, NoReturn
 
 from dotenv import load_dotenv
 
-from sa.model import Polarity, Language
 from sa.client import create_reddit_client
 from sa.collector import RedditCollector
-from sa.logger import create_logger, create_reddit_logger
-from sa.parser import parse_reddit_args
 from sa.file import CSVPostSaver, FileFormat, XLSXPostSaver
+from sa.logger import create_logger, create_reddit_logger
+from sa.model import Language, Polarity
+from sa.parser import parse_reddit_args
 
 if TYPE_CHECKING:
     from sa.model import KeywordsByPolarity, PostRecord
