@@ -1,5 +1,5 @@
-from .storage import StorageABC
+from .file import FileABC
 
 __all__ = [
-    "StorageABC",
+    "FileABC",
 ]

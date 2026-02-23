@@ -4,6 +4,6 @@ from typing import Generic, Iterable, TypeVar
 T = TypeVar("T")
 
 
-class StorageABC(ABC, Generic[T]):
+class FileABC(ABC, Generic[T]):
     @abstractmethod
     def save(self, values: Iterable[T]) -> None: ...

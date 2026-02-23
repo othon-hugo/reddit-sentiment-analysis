@@ -3,15 +3,16 @@ from typing import TYPE_CHECKING, Iterable
 
 import pandas as pd
 
-from sa.common import StorageABC
+from sa.common import FileABC
 
 if TYPE_CHECKING:
     from sa.analysis import PostRecord
 
 
-class CSVPosts(StorageABC["PostRecord"]):
-    def __init__(self, path: str | Path):
+class XLSXPosts(FileABC["PostRecord"]):
+    def __init__(self, path: str | Path, sheet_name: str = "posts"):
         self._path = Path(path)
+        self._sheet_name = sheet_name
 
     def save(self, values: Iterable["PostRecord"]) -> None:
         posts_list = list(values)
@@ -19,9 +20,9 @@ class CSVPosts(StorageABC["PostRecord"]):
         if not posts_list:
             raise ValueError("Nenhum post para exportar.")
 
-        df: pd.DataFrame = pd.DataFrame(posts_list)
+        df = pd.DataFrame(posts_list)
 
         if "created_at" in df.columns:
             df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce")
 
-        df.to_csv(self._path, index=False, encoding="utf-8")
+        df.to_excel(self._path, index=False, sheet_name=self._sheet_name)

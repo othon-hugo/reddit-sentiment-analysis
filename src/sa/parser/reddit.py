@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 from sa.analysis import Language
-from sa.storage import StorageFormat
+from sa.file import StorageFormat
 
 DEFAULT_SUBREDDIT = "conversas"
 DEFAULT_LANGUAGE = Language.PT

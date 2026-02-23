@@ -13,7 +13,7 @@ from sa.client import create_reddit_client
 from sa.collector import RedditScrapper
 from sa.logger import create_logger, create_reddit_logger
 from sa.parser import parse_reddit_args
-from sa.storage import CSVPosts, StorageFormat, XLSXPosts
+from sa.file import CSVPosts, StorageFormat, XLSXPosts
 
 if TYPE_CHECKING:
     from sa.analysis import CategorizedKeywords, PostRecord
