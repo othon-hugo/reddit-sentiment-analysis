@@ -1,4 +1,4 @@
-# Projeto de Iniciação Cientifica de Análise de Sentimentos em Redes Sociais
+# Projeto de Iniciação Científica: Análise de Sentimentos em Redes Sociais
 
 Este projeto consiste em um pipeline de extração, processamento e análise de textos provenientes da rede social Reddit, focado em categorizar e gerar métricas e recursos visuais sobre opiniões de usuários a respeito de tópicos pré-determinados.
 
