@@ -1,146 +1,75 @@
-import praw # type: ignore
-import pandas as pd # type: ignore
-import re
-import emoji
-from langdetect import detect, LangDetectException # type: ignore
-import random
+"""Script de coleta de posts do Reddit para análise de sentimentos."""
+
+from __future__ import annotations
+
+import logging
+import os
+from sys import exit
+from pathlib import Path
+from typing import NoReturn
+
 from dotenv import load_dotenv
-from os import getenv
 
-load_dotenv()
+from sa.analysis import Category, Language, CategorizedKeywords
+from sa.collector import RedditScrapper
+from sa.storage import ExcelPosts
+from sa.client import create_reddit_client
 
-# Regex para remover caracteres inválidos no Excel
-ILLEGAL_CHARACTERS_RE = re.compile(r"[\000-\010]|[\013-\014]|[\016-\037]")
 
-# Subreddits selecionado
-subreddits_alvo = ["conversas"]
-
-# Configurações da API do Reddit
-reddit = praw.Reddit(
-    client_id=getenv("REDDIT_CLIENT_ID"),
-    client_secret=getenv("REDDIT_CLIENT_SECRET"),
-    user_agent=getenv("REDDIT_CLIENT_USER_AGENT"),
-)
-
-contador = 1
-postsEncontrados = []
-textos_vistos = set()
-
-# Palavras-chave por categoria
-palavrasChavesGrupos = {
-    "positivo": ["amo", "feliz", "alegre", "adoro"],
-    "negativo": ["raiva", "triste", "ódio", "ansioso"],
-    "neutro": ["terapia", "autoestima", "sentimento", "apoio"],
+OUTPUT_DIR: Path = Path("./data").resolve()
+KEYWORDS: CategorizedKeywords = {
+    Category.POSITIVE: ["amo", "feliz", "alegre", "adoro"],
+    Category.NEGATIVE: ["raiva", "triste", "ódio", "ansioso"],
+    Category.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
 }
 
 
-# Loop para selecionar cada palavra chave e realizar varredura na API reddit
-for categoria, palavras in palavrasChavesGrupos.items():
-    total_categoria = 50000
-    num_palavras = len(palavras)
-    limite_por_palavra = total_categoria // num_palavras
-
-    for palavra in palavras:
-        posts_coletados_palavra = 0
-
-        for nome_subreddit in subreddits_alvo:
-            subreddit = reddit.subreddit(nome_subreddit)
-
-            # Busca nos títulos e corpos das submissões
-            for submission in subreddit.search(
-                palavra, sort="new", limit=limite_por_palavra
-            ):
-                # Solução temporária para o problema da quantidade de posts
-                if posts_coletados_palavra >= 200:
-                    break
-
-                # Tratamento dos posts selecionados
-                texto = f"{submission.title} {submission.selftext}".replace(
-                    "\n", " "
-                ).strip()
-                texto = emoji.demojize(texto)
-                texto = ILLEGAL_CHARACTERS_RE.sub("", texto)
-                texto.lower()
-
-                try:
-                    if detect(texto) != "pt":
-                        continue
-                except LangDetectException:
-                    continue
-
-                if texto in textos_vistos:
-                    continue
-                textos_vistos.add(texto)
-
-                print(f"Buscando post: {contador} ({categoria.upper()} - {palavra})")
-
-                # Salvando posts em lista
-                postsEncontrados.append(
-                    {
-                        "data": pd.to_datetime(submission.created_utc, unit="s"),
-                        "texto": texto,
-                        "autor": (
-                            submission.author.name
-                            if submission.author
-                            else "Desconhecido"
-                        ),
-                        "palavraChave": palavra,
-                        "categoria": categoria,
-                        palavra: posts_coletados_palavra,
-                    }
-                )
-
-                posts_coletados_palavra += 1
-                contador += 1
-
-            print(f"{palavra} - {posts_coletados_palavra}")
-
-            if posts_coletados_palavra >= limite_por_palavra:
-                break  # se já coletou o suficiente dessa palavra, pula para a próxima
+def fatal(message: str) -> NoReturn:
+    logging.getLogger(__name__).fatal(message)
+    exit(1)
 
 
-# Coleta de posts aleatórios após a coleta principal
-subreddit_aleatorio = reddit.subreddit("conversas")  # Pode trocar por "all" ou outro
-posts_recentes = list(
-    subreddit_aleatorio.new(limit=1000)
-)  # Busca 1000 para sortear depois
+def main() -> None:
+    """Ponto de entrada principal do script de coleta."""
 
-postsAleatorios = []
-contador_aleatorio = 1
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+    logger = logging.getLogger(__name__)
 
-for submission in random.sample(posts_recentes, k=200):
-    texto = f"{submission.title} {submission.selftext}".replace("\n", " ").strip()
-    texto = emoji.demojize(texto)
-    texto = ILLEGAL_CHARACTERS_RE.sub("", texto)
+    load_dotenv(".env")
 
     try:
-        if detect(texto) != "pt":
-            continue
-    except LangDetectException:
-        continue
+        reddit_client_id = os.environ["REDDIT_CLIENT_ID"]
+        reddit_client_secret = os.environ["REDDIT_CLIENT_SECRET"]
+        reddit_client_user_agent = os.environ["REDDIT_CLIENT_USER_AGENT"]
+    except KeyError as e:
+        fatal(f"erro ao carregar a variável de ambiente {e}")
 
-    postsAleatorios.append(
-        {
-            "data": str(submission.created_utc),
-            "texto": texto,
-            "autor": submission.author.name if submission.author else "Desconhecido",
-            "subreddit": submission.subreddit.display_name,
-        }
+    reddit_client = create_reddit_client(
+        reddit_client_id,
+        reddit_client_secret,
+        reddit_client_user_agent,
     )
 
-    print(f"[{contador_aleatorio}/200] Post aleatório coletado.")
-    contador_aleatorio += 1
+    scrapper = RedditScrapper(
+        reddit_client=reddit_client,
+        subreddit_name="conversas",
+        logger=logger,
+    )
 
-# Converte para DataFrame e salva por categoria
-df = pd.DataFrame(postsEncontrados)
+    logger.info("Iniciando a coleta de posts...")
 
-nome_arquivo = r"C:\Users\fabri\Desktop\IC Analise de sentimentos\post_saudeReddit.xlsx"
-with pd.ExcelWriter(nome_arquivo, engine="openpyxl") as writer:
-    for categoria in df["categoria"].unique():
-        df_filtrado = df[df["categoria"] == categoria]
-        aba = categoria[:31]
-        df_filtrado.to_excel(writer, sheet_name=aba, index=False)
+    posts = list(scrapper.collect(ckw=KEYWORDS, lang=Language.PT, total_per_category=100))
 
-    if postsAleatorios:
-        df_aleatorios = pd.DataFrame(postsAleatorios)
-        df_aleatorios.to_excel(writer, sheet_name="aleatorios", index=False)
+    logger.info("Coleta finalizada. Total de posts: %d", len(posts))
+
+    storage = ExcelPosts(OUTPUT_DIR / "teste.xlsx")
+    storage.save(posts)
+
+    logger.info("Dados exportados com sucesso.")
+
+
+if __name__ == "__main__":
+    main()
