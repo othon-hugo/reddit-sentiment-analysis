@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, NoReturn
 
 from dotenv import load_dotenv
 
-from sa.analysis import Category, Language
+from sa.model import Polarity, Language
 from sa.client import create_reddit_client
 from sa.collector import RedditScrapper
 from sa.logger import create_logger, create_reddit_logger
@@ -16,12 +16,12 @@ from sa.parser import parse_reddit_args
 from sa.file import CSVPosts, FileFormat, XLSXPosts
 
 if TYPE_CHECKING:
-    from sa.analysis import CategorizedKeywords, PostRecord
+    from sa.model import KeywordsByPolarity, PostRecord
 
-DEFAULT_KEYWORDS: "CategorizedKeywords" = {
-    Category.POSITIVE: ["amo", "feliz", "alegre", "adoro"],
-    Category.NEGATIVE: ["raiva", "triste", "ódio", "ansioso"],
-    Category.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
+DEFAULT_KEYWORDS: "KeywordsByPolarity" = {
+    Polarity.POSITIVE: ["amo", "feliz", "alegre", "adoro"],
+    Polarity.NEGATIVE: ["raiva", "triste", "ódio", "ansioso"],
+    Polarity.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
 }
 
 logger = create_logger(__name__)

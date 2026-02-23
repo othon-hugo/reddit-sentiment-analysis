@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from sa.analysis import Language
+from sa.model import Language
 from sa.file import FileFormat
 
 DEFAULT_SUBREDDIT = "conversas"

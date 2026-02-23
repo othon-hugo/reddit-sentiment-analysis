@@ -1,18 +1,12 @@
-from enum import Enum
 from hashlib import md5
-from typing import Dict, List, TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
-from pandas import Timestamp
+if TYPE_CHECKING:
+    from pandas import Timestamp
+
+    from sa.model.polarity import Polarity
 
 UNKNOWN_AUTHOR_PLACEHOLDER = "[UNKNOWN-AUTHOR]"
-
-CategorizedKeywords = Dict["Category", List[str]]
-
-
-class Category(Enum):
-    POSITIVE = "positive"
-    NEGATIVE = "negative"
-    NEUTRAL = "neutral"
 
 
 class PostRecord(TypedDict):
@@ -24,7 +18,7 @@ class PostRecord(TypedDict):
     category: str
     keyword: str
     subreddit: str
-    created_at: Timestamp
+    created_at: "Timestamp"
 
 
 def pack_post(
@@ -33,9 +27,9 @@ def pack_post(
     content: str,
     author: str,
     keyword: str,
-    category: Category,
+    category: "Polarity",
     subreddit: str,
-    created_at: Timestamp,
+    created_at: "Timestamp",
 ) -> PostRecord:
     """Empacota um post coletado por categoria."""
 

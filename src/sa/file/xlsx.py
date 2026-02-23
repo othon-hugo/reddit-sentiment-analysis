@@ -6,7 +6,7 @@ import pandas as pd
 from sa.common import FileSaverABC
 
 if TYPE_CHECKING:
-    from sa.analysis import PostRecord
+    from sa.model import PostRecord
 
 
 class XLSXPosts(FileSaverABC["PostRecord"]):
