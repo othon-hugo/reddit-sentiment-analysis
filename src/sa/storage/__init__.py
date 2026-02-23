@@ -1,7 +1,16 @@
+from enum import Enum
+
 from .csv import CSVPosts
-from .excel import ExcelPosts
+from .xlsx import XLSXPosts
+
+
+class StorageFormat(Enum):
+    CSV = "csv"
+    XLSX = "xlsx"
+
 
 __all__ = [
     "CSVPosts",
-    "ExcelPosts",
+    "XLSXPosts",
+    "StorageFormat",
 ]

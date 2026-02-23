@@ -2,16 +2,18 @@ import pandas as pd
 from typing import TYPE_CHECKING, Iterable
 from pathlib import Path
 
+from sa.common import StorageABC
+
 if TYPE_CHECKING:
     from sa.analysis import PostRecord
 
 
-class CSVPosts:
+class CSVPosts(StorageABC["PostRecord"]):
     def __init__(self, path: str | Path):
         self._path = Path(path)
 
-    def save(self, posts: Iterable["PostRecord"]) -> None:
-        posts_list = list(posts)
+    def save(self, values: Iterable["PostRecord"]) -> None:
+        posts_list = list(values)
 
         if not posts_list:
             raise ValueError("Nenhum post para exportar.")
