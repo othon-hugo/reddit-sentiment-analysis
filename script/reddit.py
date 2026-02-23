@@ -13,7 +13,7 @@ from sa.client import create_reddit_client
 from sa.collector import RedditScrapper
 from sa.logger import create_logger, create_reddit_logger
 from sa.parser import parse_reddit_args
-from sa.storage import CSVPosts, StorageFormat, XLSXPosts
+from sa.file import CSVPosts, FileFormat, XLSXPosts
 
 if TYPE_CHECKING:
     from sa.analysis import CategorizedKeywords, PostRecord
@@ -78,11 +78,11 @@ def main() -> None:
     output_filepath = args.output.resolve()
 
     match args.format:
-        case StorageFormat.CSV:
+        case FileFormat.CSV:
             logger.info("Exportando dados para CSV...")
 
             CSVPosts(output_filepath).save(all_posts)
-        case StorageFormat.XLSX:
+        case FileFormat.XLSX:
             logger.info("Exportando dados para XLSX...")
 
             XLSXPosts(output_filepath).save(all_posts)

@@ -6,11 +6,11 @@ import argparse
 from pathlib import Path
 
 from sa.analysis import Language
-from sa.storage import StorageFormat
+from sa.file import FileFormat
 
 DEFAULT_SUBREDDIT = "conversas"
 DEFAULT_LANGUAGE = Language.PT
-DEFAULT_OUTPUT_FORMAT = StorageFormat.XLSX
+DEFAULT_OUTPUT_FORMAT = FileFormat.XLSX
 DEFAULT_TOTAL_PER_WORD = 50000
 
 
@@ -25,7 +25,7 @@ class RedditParserNamespace(argparse.Namespace):
     language: Language
     total: int
     output: Path
-    format: StorageFormat
+    format: FileFormat
 
 
 def create_reddit_parser() -> RedditParser:
@@ -73,8 +73,8 @@ def create_reddit_parser() -> RedditParser:
     parser.add_argument(
         "-f",
         "--format",
-        type=StorageFormat,
-        choices=[fmt.value for fmt in StorageFormat],
+        type=FileFormat,
+        choices=[fmt.value for fmt in FileFormat],
         default=DEFAULT_OUTPUT_FORMAT.value,
         help=f"Formato do arquivo de saída (default: {DEFAULT_OUTPUT_FORMAT.value})",
     )
