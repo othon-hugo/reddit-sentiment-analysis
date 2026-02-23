@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 
 from sa.model import Polarity, Language
 from sa.client import create_reddit_client
-from sa.collector import RedditScrapper
+from sa.collector import RedditCollector
 from sa.logger import create_logger, create_reddit_logger
 from sa.parser import parse_reddit_args
-from sa.file import CSVPosts, FileFormat, XLSXPosts
+from sa.file import CSVPostSaver, FileFormat, XLSXPostSaver
 
 if TYPE_CHECKING:
     from sa.model import KeywordsByPolarity, PostRecord
@@ -55,7 +55,7 @@ def main() -> None:
     for subreddit in args.subreddits:
         subreddit_logger = create_reddit_logger(subreddit)
 
-        scrapper = RedditScrapper(
+        scrapper = RedditCollector(
             reddit_client=reddit_client,
             subreddit_name=subreddit,
             logger=subreddit_logger,
@@ -81,11 +81,11 @@ def main() -> None:
         case FileFormat.CSV:
             logger.info("Exportando dados para CSV...")
 
-            CSVPosts(output_filepath).save(all_posts)
+            CSVPostSaver(output_filepath).save(all_posts)
         case FileFormat.XLSX:
             logger.info("Exportando dados para XLSX...")
 
-            XLSXPosts(output_filepath).save(all_posts)
+            XLSXPostSaver(output_filepath).save(all_posts)
         case _:
             logger.error("Formato de armazenamento desconhecido: %s", args.format)
 

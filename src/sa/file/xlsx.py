@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from sa.model import PostRecord
 
 
-class XLSXPosts(FileSaverABC["PostRecord"]):
+class XLSXPostSaver(FileSaverABC["PostRecord"]):
     def __init__(self, path: str | Path, sheet_name: str = "posts"):
         self._path = Path(path)
         self._sheet_name = sheet_name

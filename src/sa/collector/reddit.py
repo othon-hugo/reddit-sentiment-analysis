@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sa.model import KeywordsByPolarity, Language, Polarity, PostRecord
 
 
-class RedditScrapper:
+class RedditCollector:
     def __init__(self, reddit_client: "Reddit", subreddit_name: str, logger: Optional["Logger"] = None):
         self._client = reddit_client
         self._subreddit_name = subreddit_name

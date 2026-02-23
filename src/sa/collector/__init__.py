@@ -1,5 +1,5 @@
-from .reddit import RedditScrapper
+from .reddit import RedditCollector
 
 __all__ = [
-    "RedditScrapper",
+    "RedditCollector",
 ]

@@ -1,11 +1,11 @@
 from .conveter import ConverterFactory, FileFormat
-from .csv import CSVPosts
-from .xlsx import XLSXColumnReader, XLSXPosts
+from .csv import CSVPostSaver
+from .xlsx import XLSXColumnReader, XLSXPostSaver
 
 __all__ = [
     "ConverterFactory",
-    "CSVPosts",
+    "CSVPostSaver",
     "XLSXColumnReader",
-    "XLSXPosts",
+    "XLSXPostSaver",
     "FileFormat",
 ]
