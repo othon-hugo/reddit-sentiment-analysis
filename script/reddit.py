@@ -2,21 +2,21 @@
 
 from __future__ import annotations
 
-import logging
 import os
-from sys import exit, argv
-from typing import NoReturn, TYPE_CHECKING
+from sys import argv, exit
+from typing import TYPE_CHECKING, NoReturn
 
 from dotenv import load_dotenv
 
-from sa.analysis import Language, Category
+from sa.analysis import Category, Language
 from sa.client import create_reddit_client
 from sa.collector import RedditScrapper
+from sa.logger import create_logger, create_reddit_logger
 from sa.parser import parse_reddit_args
-from sa.storage import CSVPosts, XLSXPosts, StorageFormat
+from sa.storage import CSVPosts, StorageFormat, XLSXPosts
 
 if TYPE_CHECKING:
-    from sa.analysis import CategorizedKeywords
+    from sa.analysis import CategorizedKeywords, PostRecord
 
 DEFAULT_KEYWORDS: "CategorizedKeywords" = {
     Category.POSITIVE: ["amo", "feliz", "alegre", "adoro"],
@@ -24,10 +24,7 @@ DEFAULT_KEYWORDS: "CategorizedKeywords" = {
     Category.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
 }
 
-
-def fatal(message: str) -> NoReturn:
-    logging.getLogger(__name__).fatal(message)
-    exit(1)
+logger = create_logger(__name__)
 
 
 def main() -> None:
@@ -44,55 +41,60 @@ def main() -> None:
 
     args = parse_reddit_args(argv[1:])
 
+    if args.output.exists():
+        fatal(f"O arquivo de saída {str(args.output)!r} já existe. Por favor, escolha um caminho diferente ou remova o arquivo existente.")
+
     reddit_client = create_reddit_client(
         reddit_client_id,
         reddit_client_secret,
         reddit_client_user_agent,
     )
 
+    all_posts: list[PostRecord] = []
+
     for subreddit in args.subreddits:
-        logger = logging.Logger(subreddit)
-        logger.setLevel(logging.INFO)
-
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - r/%(name)s - %(levelname)s - %(message)s")
-
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        subreddit_logger = create_reddit_logger(subreddit)
 
         scrapper = RedditScrapper(
             reddit_client=reddit_client,
             subreddit_name=subreddit,
-            logger=logger,
+            logger=subreddit_logger,
         )
 
-        logger.info("Iniciando a coleta de posts...")
+        subreddit_logger.info("Iniciando a coleta de posts  do subredit %s...", subreddit)
 
-        posts = list(
+        subreddit_posts = list(
             scrapper.collect(
                 ckw=DEFAULT_KEYWORDS,
                 lang=Language(args.language),
-                total_per_category=args.total,
+                total_per_word=args.total,
             )
         )
 
-        logger.info("Coleta finalizada. Total de posts: %d", len(posts))
+        subreddit_logger.info("Coleta do subredit %s finalizada. Total de posts: %d", subreddit, len(subreddit_posts))
 
-        output_filepath = args.output.resolve()
+        all_posts.extend(subreddit_posts)
 
-        match args.format:
-            case StorageFormat.CSV:
-                logger.info("Exportando dados para CSV...")
+    output_filepath = args.output.resolve()
 
-                CSVPosts(output_filepath).save(posts)
-            case StorageFormat.XLSX:
-                logger.info("Exportando dados para XLSX...")
+    match args.format:
+        case StorageFormat.CSV:
+            logger.info("Exportando dados para CSV...")
 
-                XLSXPosts(output_filepath).save(posts)
-            case _:
-                logger.error("Formato de armazenamento desconhecido: %s", args.format)
+            CSVPosts(output_filepath).save(all_posts)
+        case StorageFormat.XLSX:
+            logger.info("Exportando dados para XLSX...")
 
-        logger.info("Dados exportados com sucesso em %s", output_filepath)
+            XLSXPosts(output_filepath).save(all_posts)
+        case _:
+            logger.error("Formato de armazenamento desconhecido: %s", args.format)
+
+    logger.info("Dados exportados com sucesso em %s", output_filepath)
+
+
+def fatal(message: str) -> NoReturn:
+    logger.fatal(message)
+    exit(1)
 
 
 if __name__ == "__main__":
