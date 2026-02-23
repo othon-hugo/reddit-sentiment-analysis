@@ -12,12 +12,12 @@ if TYPE_CHECKING:
 
 
 class RedditScrapper:
-    def __init__(self, reddit_client: "Reddit", subreddit_name: str, logger: Optional[Logger]):
+    def __init__(self, reddit_client: "Reddit", subreddit_name: str, logger: Optional["Logger"] = None):
         self._client = reddit_client
         self._subreddit_name = subreddit_name
         self._logger = logger
 
-    def collect(self, ckw: "CategorizedKeywords", lang: "Language", total_per_category: int = 50000) -> Generator[PostRecord]:
+    def collect(self, ckw: "CategorizedKeywords", lang: "Language", total_per_category: int = 50000) -> Generator["PostRecord", None, None]:
         """
         Coleta posts de um subreddit baseando-se nas categorias e palavras-chave.
         Retorna lista de dicionários com texto, categoria e palavra-chave associada.
@@ -28,7 +28,11 @@ class RedditScrapper:
         for category, words in ckw.items():
             total_per_word = total_per_category // len(words)
 
+            self._log(f"Categoria: {category.value.upper()} | Limite por palavra: {total_per_word}")
+
             for keyword in words:
+                self._log(f"Buscando palavra-chave: '{keyword}'")
+
                 subreddit = self._client.subreddit(self._subreddit_name)
 
                 # Pesquisa por palavra-chave no título ou texto
@@ -36,19 +40,23 @@ class RedditScrapper:
                     clean_post = self._preprocess_post(post, category, keyword)
 
                     if not self._check_post_language(clean_post, lang):
+                        self._log(f"Post {clean_post['post_id']} ignorado (não é {lang.value.upper()})")
                         continue
 
                     if clean_post["content_hash"] in content_hashes:
+                        self._log(f"Post {clean_post['post_id']} ignorado (duplicado)")
                         continue
 
                     content_hashes.add(clean_post["content_hash"])
+
+                    self._log(f"Post {clean_post['post_id']} aceito!")
 
                     yield clean_post
 
                 if len(content_hashes) >= total_per_word:
                     break
 
-    def _preprocess_post(self, post: "Submission", category: "Category", keyword: str) -> PostRecord:
+    def _preprocess_post(self, post: "Submission", category: "Category", keyword: str) -> "PostRecord":
         preprocess_title = preprocess_text(post.title) or ""
         preprocess_content = preprocess_text(post.selftext) or ""
 
