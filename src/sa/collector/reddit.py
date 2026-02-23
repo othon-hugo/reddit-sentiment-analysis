@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Generator, Optional
 
-from sa.nlp import matches_language, normalize_text
 from sa.model import UNKNOWN_AUTHOR_PLACEHOLDER, pack_post
+from sa.nlp import matches_language, normalize_text
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from praw import Reddit  # type: ignore[import-untyped]
     from praw.models import Submission  # type: ignore[import-untyped]
 
-    from sa.model import KeywordsByPolarity, Polarity, Language, PostRecord
+    from sa.model import KeywordsByPolarity, Language, Polarity, PostRecord
 
 
 class RedditScrapper:

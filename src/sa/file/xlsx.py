@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Iterable
 
 import pandas as pd
 
-from sa.common import FileSaverABC, FileReaderABC
+from sa.common import FileReaderABC, FileSaverABC
 
 if TYPE_CHECKING:
     from sa.model import PostRecord

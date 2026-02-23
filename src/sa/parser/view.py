@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-
 DEFAULT_SHEETS = ["positivo", "negativo", "neutro"]
 DEFAULT_TOP_N = 20
 

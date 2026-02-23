@@ -1,7 +1,8 @@
-from sa.common import FileConverterABC
-
 from enum import Enum
+
 import pandas as pd
+
+from sa.common import FileConverterABC
 
 
 class FileFormat(Enum):

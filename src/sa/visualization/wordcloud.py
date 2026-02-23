@@ -6,7 +6,6 @@ from pathlib import Path
 
 from wordcloud import WordCloud  # type: ignore[import-untyped]
 
-
 DEFAULT_WIDTH = 800
 DEFAULT_HEIGHT = 400
 DEFAULT_COLORMAP = "viridis"

@@ -11,7 +11,6 @@ from unidecode import unidecode
 
 from sa.model import Language
 
-
 if TYPE_CHECKING:
     from spacy.language import Language as SpacyLanguage
 

@@ -1,4 +1,4 @@
-from . import nlp, client, collector, common, file, logger, parser, visualization, model
+from . import client, collector, common, file, logger, model, nlp, parser, visualization
 
 __all__ = [
     "nlp",

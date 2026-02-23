@@ -8,7 +8,6 @@ import nltk
 import spacy
 from unidecode import unidecode
 
-
 _NLTK_TO_SPACY: dict[str, str] = {
     "portuguese": "pt",
     "english": "en",
