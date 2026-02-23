@@ -23,7 +23,7 @@ classifiers = []
 packages = []
 
 [tool.poetry.urls]
-Homepage = "
+Homepage = ""
 Repository = ""
 Issues = ""
 
@@ -43,7 +43,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pylint.main]
 source-roots = []
-max-line-length = 79
+max-line-length = 150
 recursive = true
 disable = [
     "broad-exception-caught",
@@ -59,7 +59,9 @@ ignore-paths = [".venv/", "build/", "tests/"]
 [tool.mypy]
 python_version = "3.11"
 mypy_path = ""
-exclude = []
+exclude = [
+    "import-untyped"
+]
 pretty = true
 strict = true
 disallow_any_expr = false
@@ -67,7 +69,7 @@ disallow_any_unimported = false
 disallow_subclassing_any = false
 
 [tool.black]
-line-length = 79
+line-length = 150
 target-version = ["py311"]
 exclude = '''
 /(
@@ -82,7 +84,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-line_length = 79
+line_length = 150
 
 [tool.pytest.ini_options]
 addopts = "-raqsv --strict-markers --tb=no"
