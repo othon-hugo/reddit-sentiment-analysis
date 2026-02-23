@@ -1,9 +1,9 @@
-[tool.poetry]
-name = ""
-description = ""
+[project]
+name = "sa"
 version = "1.0.0"
+description = "Biblioteca para coleta e análise de sentimentos em posts do Reddit"
 readme = "README.md"
-authors = []
+requires-python = ">=3.10"
 keywords = [
     "sentiment-analysis",
     "natural-language-processing",
@@ -17,32 +17,40 @@ keywords = [
     "bag-of-words",
     "data-preprocessing",
     "model-evaluation",
-    "computational-linguistics"
+    "computational-linguistics",
 ]
-classifiers = []
-packages = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "praw",
+    "pandas",
+    "emoji",
+    "langdetect",
+    "python-dotenv",
+    "openpyxl",
+]
 
-[tool.poetry.urls]
-Homepage = ""
-Repository = ""
-Issues = ""
+[project.optional-dependencies]
+dev = [
+    "pylint>=3.3.8",
+    "mypy>=1.18.2",
+    "black>=25.9.0",
+    "isort>=6.1.0",
+    "pytest>=8.3.4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-
-[tool.poetry.dev-dependencies]
-pylint = "^3.3.8"
-mypy = "^1.18.2"
-black = "^25.9.0"
-isort = "^6.1.0"
-pytest = "^8.3.4"
+[tool.poetry]
+packages = [{ include = "sa", from = "src" }]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pylint.main]
-source-roots = []
+source-roots = ["src"]
 max-line-length = 150
 recursive = true
 disable = [
@@ -58,7 +66,7 @@ ignore-paths = [".venv/", "build/", "tests/"]
 
 [tool.mypy]
 python_version = "3.11"
-mypy_path = ""
+mypy_path = "src"
 exclude = [
     "import-untyped"
 ]
