@@ -9,17 +9,40 @@ from sa.file import FileFormat
 from sa.model import Language
 
 DEFAULT_SUBREDDIT = "conversas"
+"""Nó padrão estipulado em caso de flag `--subreddits` ausente no console."""
+
 DEFAULT_LANGUAGE = Language.PT
+"""Variável de Linguagem Padrão base da busca do PRAW e NL."""
+
 DEFAULT_OUTPUT_FORMAT = FileFormat.XLSX
+"""Formato padrão estipulado em caso da flag omissa de exportação."""
+
 DEFAULT_TOTAL_PER_WORD = 50000
+"""Teto operacional máximo garantido (cap) por tópico analisado."""
 
 
 class RedditParser(argparse.ArgumentParser):
-    """Parser de argumentos para coleta de posts do Reddit."""
+    """
+    Parser configurado unicamente para lidar com o script de coleta contínua da API (RedditCollector).
+
+    Herda base argparse estendendo para alocar metadados descritivos durante debug.
+    """
 
 
 class RedditParserNamespace(argparse.Namespace):
-    """Tipagem explícita dos atributos retornados pelo parser."""
+    """
+    Estrutura que vincula forte tipagem nas propriedades do wrapper Namespace.
+
+    Força restrições nas saídas originárias dos scripts de parse. Atende primáriamente as tipagens nativas do NLP
+    sendo absorvidas a longo dos controladores de script (`sa-reddit`).
+
+    Attributes:
+        subreddits (list[str]): Coleção ordenada das strings (nomes de abas Reddit alvo) processadas em massa.
+        language (Language): Estrutura enumerador de filtragem (es, pt).
+        total (int): Volume numérico int teto usado na função `limit`.
+        output (Path): Path consolidado garantindo compatibilidade da saída.
+        format (FileFormat): Sinalética rigorosa para driver interpretador (pandas: csv/xlsx).
+    """
 
     subreddits: list[str]
     language: Language
@@ -29,7 +52,15 @@ class RedditParserNamespace(argparse.Namespace):
 
 
 def create_reddit_parser() -> RedditParser:
-    """Cria e configura o parser de argumentos para coleta no Reddit."""
+    """
+    Cria e configura o subparser contendo as regras de CLI voltados para o Reddit API.
+
+    Retorna o container ArgumentParser enriquecido das checagens necessárias como total de limites, linguage e
+    destino do Path operando o `sys.argv`.
+
+    Returns:
+        RedditParser: Instancia não iniciada pronta processável com as flags (--total, --language).
+    """
 
     parser = RedditParser(
         prog="sa-reddit",
@@ -83,7 +114,17 @@ def create_reddit_parser() -> RedditParser:
 
 
 def parse_reddit_args(argv: list[str] | None = None) -> RedditParserNamespace:
-    """Parseia os argumentos da linha de comando e retorna um namespace tipado."""
+    """
+    Inicializa processamento CLI transformando input livre de String em Variáveis Fortes (Namespace Customizado).
+
+    Lida com injeções isoladas de lista Python para facilitar injeção de Mock por TDD sem interações com o Terminal, ou assume terminal normal via PRAW/script local `sys.argv`.
+
+    Args:
+        argv (list[str] | None, optional): Parâmetro para simular chaves pelo shell ou pytest de forma programática.
+
+    Returns:
+        RedditParserNamespace: Atributos convertidos para sua classe raiz (Paths, Enums, Lists) protegidos por tipo.
+    """
 
     parser = create_reddit_parser()
 

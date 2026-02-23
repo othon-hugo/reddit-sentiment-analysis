@@ -8,15 +8,34 @@ from pathlib import Path
 from sa.file import FileFormat
 
 DEFAULT_INPUT_FORMAT = FileFormat.CSV
+"""Formato padrão estipulado em caso de não assinalamento na conversão de entrada."""
+
 DEFAULT_OUTPUT_FORMAT = FileFormat.XLSX
+"""Formato padrão estipulado em caso de não assinalamento na conversão de saída."""
 
 
 class ConverterParser(argparse.ArgumentParser):
-    """Parser para conversão de arquivos"""
+    """
+    Parser adaptado configurado para lidar com o conversor de arquivos estático.
+
+    Herda a interface padrão do `argparse.ArgumentParser` fornecendo um ponto de extensão
+    separado para os scripts `sa-converter` ou suas abstrações.
+    """
 
 
 class ConverterParserNamespace(argparse.Namespace):
-    """Tipagem explícita dos atributos retornados pelo parser."""
+    """
+    Interface que aplica anotação explícita de tipos no retorno processado.
+
+    Atributos definidos que espelham perfeitamente os contêiners e restrições informadas
+    durante o instanciamento das classes. Auxilia as IDEs e mypy na previsão da integridade dos inputs dinâmicos.
+
+    Attributes:
+        input_format (FileFormat): Instância de enumeração que valida rigorosamente o tipo de entrada (CSVs, etc).
+        output_format (FileFormat): Designação rigorosa para a translação do arquivo final.
+        input_path (Path): Objeto representativo de apontamento do arquivo original de OS.
+        output_path (Path): Path representativo definindo diretório onde o dataset pós-convertido será mantido.
+    """
 
     input_format: FileFormat
     output_format: FileFormat
@@ -25,7 +44,15 @@ class ConverterParserNamespace(argparse.Namespace):
 
 
 def create_conveter_parser() -> ConverterParser:
-    """Cria e configura o parser de argumentos para conversão de arquivos."""
+    """
+    Monta e formata inteiramente a instância parser exclusiva a arquivos transacionais.
+
+    Popula com argumentos tipados (Path, Enums de arquivo nativas da engine) as
+    regras e validações das chaves/flags preestabelecidas antes do runtime principal iniciar.
+
+    Returns:
+        ConverterParser: Classe pronta com subrotinas da flag (--help, -if, -of) embarcadas prontas para chamamento da linha.
+    """
 
     parser = ConverterParser(
         prog="sa-converter",
@@ -70,7 +97,19 @@ def create_conveter_parser() -> ConverterParser:
 
 
 def parse_converter_args(argv: list[str] | None = None) -> ConverterParserNamespace:
-    """Parseia os argumentos da linha de comando e retorna um namespace tipado."""
+    """
+    Gatilho de execução dos argumentos interceptados através do console ao script.
+
+    Instância o `create_conveter_parser()`, intercepta os vetores `sys.argv` (ou injetáveis
+    via debug mode) e o sobreescreve infundindo a assinatura estrita do Namespace gerado sob
+    medida para a classe Conversora.
+
+    Args:
+        argv (list[str] | None, optional): Parâmetro para simular chaves pelo shell ou pytest de forma programática.
+
+    Returns:
+        ConverterParserNamespace: Pacote resolvido garantindo campos (input_path etc...) rigorosamente populados e checados tipadamente.
+    """
 
     parser = create_conveter_parser()
 
