@@ -1,16 +1,11 @@
-from enum import Enum
-
 from .csv import CSVPosts
 from .xlsx import XLSXPosts
-
-
-class StorageFormat(Enum):
-    CSV = "csv"
-    XLSX = "xlsx"
+from .conveter import FileFormat, ConverterFactory
 
 
 __all__ = [
+    "ConverterFactory",
     "CSVPosts",
     "XLSXPosts",
-    "StorageFormat",
+    "FileFormat",
 ]
