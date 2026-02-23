@@ -1,9 +1,9 @@
-[tool.poetry]
-name = ""
-description = ""
+[project]
+name = "sa"
 version = "1.0.0"
+description = "Biblioteca para coleta e análise de sentimentos em posts do Reddit"
 readme = "README.md"
-authors = []
+requires-python = ">=3.10"
 keywords = [
     "sentiment-analysis",
     "natural-language-processing",
@@ -17,33 +17,41 @@ keywords = [
     "bag-of-words",
     "data-preprocessing",
     "model-evaluation",
-    "computational-linguistics"
+    "computational-linguistics",
 ]
-classifiers = []
-packages = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "praw",
+    "pandas",
+    "emoji",
+    "langdetect",
+    "python-dotenv",
+    "openpyxl",
+]
 
-[tool.poetry.urls]
-Homepage = "
-Repository = ""
-Issues = ""
+[project.optional-dependencies]
+dev = [
+    "pylint>=3.3.8",
+    "mypy>=1.18.2",
+    "black>=25.9.0",
+    "isort>=6.1.0",
+    "pytest>=8.3.4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-
-[tool.poetry.dev-dependencies]
-pylint = "^3.3.8"
-mypy = "^1.18.2"
-black = "^25.9.0"
-isort = "^6.1.0"
-pytest = "^8.3.4"
+[tool.poetry]
+packages = [{ include = "sa", from = "src" }]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pylint.main]
-source-roots = []
-max-line-length = 79
+source-roots = ["src"]
+max-line-length = 150
 recursive = true
 disable = [
     "broad-exception-caught",
@@ -58,8 +66,10 @@ ignore-paths = [".venv/", "build/", "tests/"]
 
 [tool.mypy]
 python_version = "3.11"
-mypy_path = ""
-exclude = []
+mypy_path = "src"
+exclude = [
+    "import-untyped"
+]
 pretty = true
 strict = true
 disallow_any_expr = false
@@ -67,7 +77,7 @@ disallow_any_unimported = false
 disallow_subclassing_any = false
 
 [tool.black]
-line-length = 79
+line-length = 150
 target-version = ["py311"]
 exclude = '''
 /(
@@ -82,7 +92,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-line_length = 79
+line_length = 150
 
 [tool.pytest.ini_options]
 addopts = "-raqsv --strict-markers --tb=no"

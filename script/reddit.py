@@ -1,0 +1,104 @@
+"""Script de coleta de posts do Reddit para análise de sentimentos."""
+
+from __future__ import annotations
+
+import os
+from sys import argv, exit
+from typing import TYPE_CHECKING, NoReturn
+
+from dotenv import load_dotenv
+
+from sa.analysis import Category, Language
+from sa.client import create_reddit_client
+from sa.collector import RedditScrapper
+from sa.logger import create_logger, create_reddit_logger
+from sa.parser import parse_reddit_args
+from sa.storage import CSVPosts, StorageFormat, XLSXPosts
+
+if TYPE_CHECKING:
+    from sa.analysis import CategorizedKeywords, PostRecord
+
+DEFAULT_KEYWORDS: "CategorizedKeywords" = {
+    Category.POSITIVE: ["amo", "feliz", "alegre", "adoro"],
+    Category.NEGATIVE: ["raiva", "triste", "ódio", "ansioso"],
+    Category.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
+}
+
+logger = create_logger(__name__)
+
+
+def main() -> None:
+    """Ponto de entrada principal do script de coleta."""
+
+    load_dotenv(".env")
+
+    try:
+        reddit_client_id = os.environ["REDDIT_CLIENT_ID"]
+        reddit_client_secret = os.environ["REDDIT_CLIENT_SECRET"]
+        reddit_client_user_agent = os.environ["REDDIT_CLIENT_USER_AGENT"]
+    except KeyError as e:
+        fatal(f"erro ao carregar a variável de ambiente {e}")
+
+    args = parse_reddit_args(argv[1:])
+
+    if args.output.exists():
+        fatal(f"O arquivo de saída {str(args.output)!r} já existe. Por favor, escolha um caminho diferente ou remova o arquivo existente.")
+
+    reddit_client = create_reddit_client(
+        reddit_client_id,
+        reddit_client_secret,
+        reddit_client_user_agent,
+    )
+
+    all_posts: list[PostRecord] = []
+
+    for subreddit in args.subreddits:
+        subreddit_logger = create_reddit_logger(subreddit)
+
+        scrapper = RedditScrapper(
+            reddit_client=reddit_client,
+            subreddit_name=subreddit,
+            logger=subreddit_logger,
+        )
+
+        subreddit_logger.info("Iniciando a coleta de posts  do subredit %s...", subreddit)
+
+        subreddit_posts = list(
+            scrapper.collect(
+                ckw=DEFAULT_KEYWORDS,
+                lang=Language(args.language),
+                total_per_word=args.total,
+            )
+        )
+
+        subreddit_logger.info("Coleta do subredit %s finalizada. Total de posts: %d", subreddit, len(subreddit_posts))
+
+        all_posts.extend(subreddit_posts)
+
+    output_filepath = args.output.resolve()
+
+    match args.format:
+        case StorageFormat.CSV:
+            logger.info("Exportando dados para CSV...")
+
+            CSVPosts(output_filepath).save(all_posts)
+        case StorageFormat.XLSX:
+            logger.info("Exportando dados para XLSX...")
+
+            XLSXPosts(output_filepath).save(all_posts)
+        case _:
+            logger.error("Formato de armazenamento desconhecido: %s", args.format)
+
+    logger.info("Dados exportados com sucesso em %s", output_filepath)
+
+
+def fatal(message: str) -> NoReturn:
+    logger.fatal(message)
+    exit(1)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nColeta interrompida pelo usuário.")
