@@ -1,8 +1,10 @@
-from logging import INFO, Logger, StreamHandler, getLogger
+from logging import INFO
+from logging import Logger as _Logger
+from logging import StreamHandler
 
 
-def get_logger(name: str) -> Logger:
-    return getLogger(name)
+class Logger(_Logger):
+    pass
 
 
 def create_logger(name: str) -> Logger:

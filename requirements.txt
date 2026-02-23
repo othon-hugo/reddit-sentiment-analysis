@@ -3,3 +3,9 @@ pandas
 emoji
 langdetect
 python-dotenv
+openpyxl
+wordcloud
+spacy
+nltk
+unidecode
+matplotlib

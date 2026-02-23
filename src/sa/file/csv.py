@@ -6,10 +6,10 @@ import pandas as pd
 from sa.common import FileSaverABC
 
 if TYPE_CHECKING:
-    from sa.analysis import PostRecord
+    from sa.model import PostRecord
 
 
-class CSVPosts(FileSaverABC["PostRecord"]):
+class CSVPostSaver(FileSaverABC["PostRecord"]):
     def __init__(self, path: str | Path):
         self._path = Path(path)
 

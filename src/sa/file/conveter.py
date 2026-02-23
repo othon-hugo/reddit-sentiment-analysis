@@ -1,7 +1,8 @@
-from sa.common import FileConverterABC
-
 from enum import Enum
+
 import pandas as pd
+
+from sa.common import FileConverterABC
 
 
 class FileFormat(Enum):
@@ -9,13 +10,13 @@ class FileFormat(Enum):
     XLSX = "xlsx"
 
 
-class CSV_XLSXConverter(FileConverterABC):
+class _CSV_XLSXConverter(FileConverterABC):
     def convert(self, input_path: str, output_path: str) -> None:
         df = pd.read_csv(input_path)
         df.to_excel(output_path, index=False)
 
 
-class XLSX_CSVConverter(FileConverterABC):
+class _XLSX_CSVConverter(FileConverterABC):
     def convert(self, input_path: str, output_path: str) -> None:
         df = pd.read_excel(input_path)
         df.to_csv(output_path, index=False)
@@ -23,8 +24,8 @@ class XLSX_CSVConverter(FileConverterABC):
 
 class ConverterFactory:
     _converters: dict[tuple[FileFormat, FileFormat], type[FileConverterABC]] = {
-        (FileFormat.CSV, FileFormat.XLSX): CSV_XLSXConverter,
-        (FileFormat.XLSX, FileFormat.CSV): XLSX_CSVConverter,
+        (FileFormat.CSV, FileFormat.XLSX): _CSV_XLSXConverter,
+        (FileFormat.XLSX, FileFormat.CSV): _XLSX_CSVConverter,
     }
 
     @classmethod

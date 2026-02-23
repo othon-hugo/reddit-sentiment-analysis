@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Generator, Optional
 
-from sa.analysis import UNKNOWN_AUTHOR_PLACEHOLDER, matches_language, pack_post, preprocess_text
+from sa.model import UNKNOWN_AUTHOR_PLACEHOLDER, pack_post
+from sa.nlp import matches_language, normalize_text
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -8,16 +9,16 @@ if TYPE_CHECKING:
     from praw import Reddit  # type: ignore[import-untyped]
     from praw.models import Submission  # type: ignore[import-untyped]
 
-    from sa.analysis import CategorizedKeywords, Category, Language, PostRecord
+    from sa.model import KeywordsByPolarity, Language, Polarity, PostRecord
 
 
-class RedditScrapper:
+class RedditCollector:
     def __init__(self, reddit_client: "Reddit", subreddit_name: str, logger: Optional["Logger"] = None):
         self._client = reddit_client
         self._subreddit_name = subreddit_name
         self._logger = logger
 
-    def collect(self, ckw: "CategorizedKeywords", lang: "Language", total_per_word: int) -> Generator["PostRecord", None, None]:
+    def collect(self, ckw: "KeywordsByPolarity", lang: "Language", total_per_word: int) -> Generator["PostRecord", None, None]:
         """
         Coleta posts de um subreddit baseando-se nas categorias e palavras-chave.
         Retorna lista de dicionários com texto, categoria e palavra-chave associada.
@@ -54,9 +55,9 @@ class RedditScrapper:
                 if len(content_hashes) >= total_per_word:
                     break
 
-    def _preprocess_post(self, post: "Submission", category: "Category", keyword: str) -> "PostRecord":
-        preprocess_title = preprocess_text(post.title) or ""
-        preprocess_content = preprocess_text(post.selftext) or ""
+    def _preprocess_post(self, post: "Submission", category: "Polarity", keyword: str) -> "PostRecord":
+        preprocess_title = normalize_text(post.title) or ""
+        preprocess_content = normalize_text(post.selftext) or ""
 
         return pack_post(
             post_id=str(post.id),
