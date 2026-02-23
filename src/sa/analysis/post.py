@@ -1,7 +1,8 @@
-from typing import TypedDict, Dict, List
-from pandas import Timestamp
 from enum import Enum
 from hashlib import md5
+from typing import Dict, List, TypedDict
+
+from pandas import Timestamp
 
 UNKNOWN_AUTHOR_PLACEHOLDER = "[UNKNOWN-AUTHOR]"
 

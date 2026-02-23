@@ -1,6 +1,7 @@
-import pandas as pd
-from typing import TYPE_CHECKING, Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING, Iterable
+
+import pandas as pd
 
 from sa.common import StorageABC
 

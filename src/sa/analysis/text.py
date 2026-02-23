@@ -1,8 +1,8 @@
-import emoji
 import re
-
 from enum import Enum
-from langdetect import detect, LangDetectException  # type: ignore[import-untyped]
+
+import emoji
+from langdetect import LangDetectException, detect  # type: ignore[import-untyped]
 
 BAD_CHARACTERS = re.compile(r"[\000-\010]|[\013-\014]|[\016-\037]")
 

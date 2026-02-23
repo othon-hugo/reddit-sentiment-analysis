@@ -1,4 +1,4 @@
-from logging import Logger, StreamHandler, Formatter, INFO
+from logging import INFO, Formatter, Logger, StreamHandler
 
 
 class RedditLogger(Logger):

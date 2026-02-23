@@ -1,4 +1,4 @@
-from logging import getLogger, Logger, INFO, StreamHandler
+from logging import INFO, Logger, StreamHandler, getLogger
 
 
 def get_logger(name: str) -> Logger:
