@@ -1,0 +1,1 @@
+# Modelos de Domínio (`model/`)

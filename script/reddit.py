@@ -1,4 +1,4 @@
-"""Script de coleta de posts do Reddit para análise de sentimentos."""
+"""Script CLI orquestrador e coordenador da base Crawler para o ecossistema do API Reddit."""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING, NoReturn
 
 from dotenv import load_dotenv
 
-from sa.model import Polarity, Language
 from sa.client import create_reddit_client
 from sa.collector import RedditCollector
-from sa.logger import create_logger, create_reddit_logger
-from sa.parser import parse_reddit_args
 from sa.file import CSVPostSaver, FileFormat, XLSXPostSaver
+from sa.logger import create_logger, create_reddit_logger
+from sa.model import Language, Polarity
+from sa.parser import parse_reddit_args
 
 if TYPE_CHECKING:
     from sa.model import KeywordsByPolarity, PostRecord
@@ -23,12 +23,27 @@ DEFAULT_KEYWORDS: "KeywordsByPolarity" = {
     Polarity.NEGATIVE: ["raiva", "triste", "ódio", "ansioso"],
     Polarity.NEUTRAL: ["terapia", "autoestima", "sentimento", "apoio"],
 }
+"""Lexo/Tag Matrix padrão injetado no collector quando submetido a execução limpa para iniciar a amostragem."""
+
 
 logger = create_logger(__name__)
 
 
 def main() -> None:
-    """Ponto de entrada principal do script de coleta."""
+    """
+    Inicializador transacional do script encarregado da captura em série das chamadas Crawler.
+
+    Passos essenciais orquestrados sequencialmente:
+    - Importa metadados rígidos dotEnv para proteger tokens e AppSecrets da API PRAW.
+    - Restringe caminhos sobrescrevíveis pra evitar sobregravações.
+    - Cria Conectores Wrapper que efetuam handshakes do protocolo OAuth2 perante aos servidores Reddit.
+    - Itera sobre N comunindades (subreddits) fornecidas chamando instancias isoladas de Loggers e Scraping Engines independentes.
+    - Funde, estende dados agregando massivamente os registros a uma estrutura Array (`all_posts_`).
+    - Exclusivamente no fim de todos fechamentos, subem arquivos gerados ao disco usando classes abstratas (CSV/XLSX) formatados via Pandas O(n).
+
+    Raises:
+        - KeyError: Irá fatalizar se token dotEnv ausente.
+    """
 
     load_dotenv(".env")
 
@@ -93,6 +108,13 @@ def main() -> None:
 
 
 def fatal(message: str) -> NoReturn:
+    """
+    Aborto imediato padronizado de terminal.
+
+    Args:
+        message (str): Erro emitido para depuração em console e syslog antes de matar processamento daemon.
+    """
+
     logger.fatal(message)
     exit(1)
 

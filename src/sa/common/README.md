@@ -1,0 +1,1 @@
+# Contratos e Interfaces (`common/`)
