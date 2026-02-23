@@ -11,7 +11,7 @@ from sa.storage import StorageFormat
 DEFAULT_SUBREDDIT = "conversas"
 DEFAULT_LANGUAGE = Language.PT
 DEFAULT_OUTPUT_FORMAT = StorageFormat.XLSX
-DEFAULT_TOTAL_PER_CATEGORY = 50000
+DEFAULT_TOTAL_PER_WORD = 50000
 
 
 class RedditParser(argparse.ArgumentParser):
@@ -58,8 +58,8 @@ def create_reddit_parser() -> RedditParser:
         "-t",
         "--total",
         type=int,
-        default=DEFAULT_TOTAL_PER_CATEGORY,
-        help=f"Total de posts por categoria (default: {DEFAULT_TOTAL_PER_CATEGORY})",
+        default=DEFAULT_TOTAL_PER_WORD,
+        help=f"Total de posts por palavra (default: {DEFAULT_TOTAL_PER_WORD})",
     )
 
     parser.add_argument(

@@ -17,7 +17,7 @@ class RedditScrapper:
         self._subreddit_name = subreddit_name
         self._logger = logger
 
-    def collect(self, ckw: "CategorizedKeywords", lang: "Language", total_per_category: int = 50000) -> Generator["PostRecord", None, None]:
+    def collect(self, ckw: "CategorizedKeywords", lang: "Language", total_per_word: int) -> Generator["PostRecord", None, None]:
         """
         Coleta posts de um subreddit baseando-se nas categorias e palavras-chave.
         Retorna lista de dicionários com texto, categoria e palavra-chave associada.
@@ -26,8 +26,6 @@ class RedditScrapper:
         content_hashes: set[str] = set()
 
         for category, words in ckw.items():
-            total_per_word = total_per_category // len(words)
-
             self._log(f"Categoria: {category.value.upper()} | Limite por palavra: {total_per_word}")
 
             for keyword in words:
