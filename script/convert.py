@@ -1,4 +1,4 @@
-"""Script de conversão de arquivos entre formatos suportados."""
+"""Script interativo do terminal (CLI) focado na conversão de extensões tabulares."""
 
 from __future__ import annotations
 
@@ -13,7 +13,17 @@ logger = create_logger(__name__)
 
 
 def main() -> None:
-    """Ponto de entrada principal do script de conversão."""
+    """
+    Ponto de inicialização do programa de console de conversão.
+
+    Avalia de forma sequencial todos as flags CLI inseridas no trigger, convertendo o formato
+    bruto capturado para nomes limpos e restrições. Paralelamente provê travas
+    e impedimentos de perda de dados acidental (como abortar ao tentar sobreescrever um
+    arquivo acidentalmente). Posteriormente transaciona os buffers no Pandas Factory logando o avanço.
+
+    Exceptions/Raises:
+        - Os raises críticos do argParse acendem a flag fatal da aplicação injetando exitCode=1.
+    """
 
     args = parse_converter_args(argv[1:])
 
@@ -35,6 +45,16 @@ def main() -> None:
 
 
 def fatal(message: str) -> NoReturn:
+    """
+    Controlador estrito disparador de erros irrecuperáveis via Shell.
+
+    Anota o registro de evento critico final e força um encerramento forçoso não nulo OS `exit(1)`
+    repassando adequadamente falhas a orquestradores docker e makefiles de rotina.
+
+    Args:
+        message (str): String com formato descritivo terminal informando por quê a aplicação abortou.
+    """
+
     logger.fatal(message)
     exit(1)
 

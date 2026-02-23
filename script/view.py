@@ -1,4 +1,4 @@
-"""Script de geração de nuvens de palavras e gráficos de frequência."""
+"""Script unificado CLI executável produtor dos relatórios analíticos de sentimentos das planilhas."""
 
 from __future__ import annotations
 
@@ -19,18 +19,29 @@ COLORMAPS: dict[str, str] = {
     "negativo": "plasma",
     "neutro": "magma",
 }
+"""Matriz mapeando e restringindo tabelas estéticas aos humores do matplotlib correlatos as Sheets das planilhas."""
+
 
 BAR_COLORS: dict[str, str] = {
     "positivo": "seagreen",
     "negativo": "indianred",
     "neutro": "mediumpurple",
 }
+"""Hash map isolando palhetas cores sólidas matplotlib as sheets do Excel correlacionadas dinâmicamente."""
 
 logger = create_logger(__name__)
 
 
 def main() -> None:
-    """Ponto de entrada principal do script de geração de nuvens de palavras."""
+    """
+    Rotina construtora central iterável produtora do motor final visual da pipeline (View Script CLI).
+
+    Atribui primeiramente restrições estruturais CLI. Aciona motor pesada de redes neurais carregando o SpaCy LG core em memoria principal. Fabrica Set de stopwords, então itera ciclicamente as abas lidas, pre-processando via Lematização tokenizada com filtragem `visual_pos (NOUN e ADJ)` o Corpus textual massivo agrupando os outputs estáticos via counter para extração iteradora dos utilitários `generate_frequency_chart` e `generate_wordcloud`.
+
+    Observações:
+        - Carrega dependência "pt_core_news_lg" estática consumindo memória no build.
+        - Filtra apenas por Substantivos e Adjetivos, para aprimorar o contexto visual dos sentimentos gerados em plot.
+    """
 
     args = parse_wordcloud_args(argv[1:])
 
@@ -96,6 +107,8 @@ def main() -> None:
 
 
 def fatal(message: str) -> NoReturn:
+    """Interrompe e relata aborto sistêmico do construtor gráfico visual."""
+
     logger.fatal(message)
     exit(1)
 
